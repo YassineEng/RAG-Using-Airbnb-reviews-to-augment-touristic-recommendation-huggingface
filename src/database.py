@@ -28,7 +28,7 @@ def load_reviews_batch(engine, offset):
             property_country,
             city
         FROM
-            cleaned_reviews
+            cleaned_reviews_view
         ORDER BY
             listing_id
         OFFSET {offset} ROWS

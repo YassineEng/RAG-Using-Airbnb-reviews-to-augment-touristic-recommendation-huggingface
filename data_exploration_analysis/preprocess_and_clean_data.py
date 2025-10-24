@@ -11,60 +11,59 @@ from src.database import get_db_engine
 
 def preprocess_and_clean_data():
     """
-    Loads review and listing data, cleans it, and saves it to a new table.
+    Creates a SQL view that represents the cleaned and preprocessed review data.
+    This avoids duplicating data and saves storage space.
     """
-    print("Starting data preprocessing and cleaning...")
+    print("Starting data preprocessing and cleaning by creating a SQL view...")
     engine = get_db_engine()
     if not engine:
         print("❌ Failed to get database engine. Exiting.")
         return
 
-    # Load data
-    print("Loading data from fact_reviews and dim_listings...")
+    view_name = "cleaned_reviews_view"
+
+    # Drop the view if it already exists to ensure a fresh creation
+    drop_view_sql = f"IF OBJECT_ID('{view_name}', 'V') IS NOT NULL DROP VIEW {view_name};"
     try:
-        reviews_df = pd.read_sql("SELECT listing_id, comments, review_lang FROM fact_reviews", engine)
-        listings_df = pd.read_sql("SELECT listing_id, property_country, property_city FROM dim_listings", engine)
+        with engine.connect() as connection:
+            connection.execute(text(drop_view_sql))
+            connection.commit()
+        print(f"Dropped existing view '{view_name}' (if it existed).")
     except Exception as e:
-        print(f"❌ Error loading data: {e}")
-        return
-    
-    print(f"Loaded {len(reviews_df)} reviews and {len(listings_df)} listings.")
+        print(f"❌ Error dropping existing view {view_name}: {e}")
+        # Continue anyway, as the view might not exist
 
-    # Merge data
-    df = pd.merge(reviews_df, listings_df, on="listing_id")
-    print(f"Merged data into a single DataFrame with {len(df)} rows.")
+    # SQL statement to create the view with cleaning logic
+    create_view_sql = f"""
+        CREATE VIEW {view_name} AS
+        SELECT
+            fr.listing_id,
+            fr.comments AS review_text,
+            fr.review_lang,
+            dl.property_country,
+            dl.city
+        FROM
+            fact_reviews AS fr
+        JOIN
+            dim_listings AS dl ON fr.listing_id = dl.listing_id
+        WHERE
+            fr.comments IS NOT NULL
+            AND LTRIM(RTRIM(fr.comments)) <> ''
+            AND fr.comments NOT LIKE '%unknown%'
+            AND dl.property_country IS NOT NULL
+            AND LTRIM(RTRIM(dl.property_country)) <> ''
+            AND dl.city IS NOT NULL
+            AND LTRIM(RTRIM(dl.city)) <> ''
+    """
 
-    # Cleaning logic
-    print("Applying cleaning logic...")
-    initial_rows = len(df)
-    if not df.empty:
-        # Filter out NULLs, empty strings or 'unknown' for comments
-        df = df.dropna(subset=['comments'])
-        df = df[df['comments'].str.strip().astype(bool)]
-        df = df[~df['comments'].str.contains('unknown', case=False, na=False)]
-
-        # Filter out NULLs or empty strings for property_country
-        df = df.dropna(subset=['property_country'])
-        df = df[df['property_country'].str.strip().astype(bool)]
-
-        # Filter out NULLs or empty strings for property_city
-        df = df.dropna(subset=['property_city'])
-        df = df[df['property_city'].str.strip().astype(bool)]
-
-    filtered_rows = len(df)
-    if initial_rows > filtered_rows:
-        print(f"Filtered {initial_rows - filtered_rows} problematic rows.")
-
-    # Rename columns to match what load_reviews_batch was producing
-    df = df.rename(columns={"comments": "review_text"})
-
-    # Save cleaned data to a new table
-    print("Saving cleaned data to 'cleaned_reviews' table...")
     try:
-        df.to_sql("cleaned_reviews", engine, if_exists="replace", index=False)
-        print("✅ Cleaned data saved successfully.")
+        with engine.connect() as connection:
+            connection.execute(text(create_view_sql))
+            connection.commit()
+        print(f"✅ Successfully created view '{view_name}'.")
+        print("This view dynamically provides cleaned data without duplicating storage.")
     except Exception as e:
-        print(f"❌ Error saving cleaned data: {e}")
+        print(f"❌ Error creating view {view_name}: {e}")
         return
 
 if __name__ == "__main__":
