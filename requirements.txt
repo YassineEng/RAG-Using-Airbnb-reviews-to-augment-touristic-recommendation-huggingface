@@ -1,0 +1,9 @@
+pandas
+numpy
+faiss-cpu
+SQLAlchemy
+openai
+tqdm
+pyodbc
+requests
+python-dotenv
