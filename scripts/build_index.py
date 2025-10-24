@@ -1,13 +1,21 @@
 import pandas as pd
 import faiss
 import pickle
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config import BATCH_SIZE, FAISS_INDEX_PATH, META_PATH
 from src.database import get_db_engine, load_reviews_batch
 from src.embedding import embed_batch_safe
 from src.faiss_index import FaissIndex
+from data_exploration_analysis.preprocess_and_clean_data import preprocess_and_clean_data
 
 def build_faiss_index():
+    # First, preprocess and clean the data
+    preprocess_and_clean_data()
+
     print("Attempting to get database engine...")
     engine = get_db_engine()
     if not engine:

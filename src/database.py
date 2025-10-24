@@ -18,33 +18,22 @@ def get_db_engine():
 
 def load_reviews_batch(engine, offset):
     """
-    Loads a batch of reviews from the database and filters out problematic entries.
-    Filters:
-    - review_text is NULL
-    - review_text is empty or whitespace only
-    - review_text contains 'unknown' (case-insensitive)
+    Loads a batch of cleaned reviews from the database.
     """
     query = f"""
-        SELECT listing_id, review_text, lang_detect, rating
-        FROM fact_reviews
-        ORDER BY listing_id
+        SELECT
+            listing_id,
+            review_text,
+            review_lang,
+            property_country,
+            city
+        FROM
+            cleaned_reviews
+        ORDER BY
+            listing_id
         OFFSET {offset} ROWS
         FETCH NEXT {BATCH_SIZE} ROWS ONLY
     """
     df = pd.read_sql(query, engine)
-
-    # Filter out problematic reviews
-    initial_rows = len(df)
-    if not df.empty:
-        # Filter out NULLs
-        df = df.dropna(subset=['review_text'])
-        # Filter out empty strings or whitespace only
-        df = df[df['review_text'].str.strip().astype(bool)]
-        # Filter out 'unknown' (case-insensitive)
-        df = df[~df['review_text'].str.contains('unknown', case=False, na=False)]
-
-    filtered_rows = len(df)
-    if initial_rows > filtered_rows:
-        print(f"Filtered {initial_rows - filtered_rows} problematic reviews from the batch.")
 
     return df

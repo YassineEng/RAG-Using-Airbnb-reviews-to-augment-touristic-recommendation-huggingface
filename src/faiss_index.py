@@ -16,15 +16,23 @@ class FaissIndex:
         for i, row in enumerate(df_batch.itertuples()):
             self.metadata[self.current_id] = {
                 "listing_id": row.listing_id,
-                "rating": row.rating,
-                "text": row.review_text
+                "text": row.comments,
+                "country": row.property_country,
+                "city": row.city
             }
             self.current_id += 1
 
     def search(self, query_embedding, top_k):
         """Searches the FAISS index for top_k similar embeddings."""
         D, I = self.index.search(np.array([query_embedding]).astype('float32'), top_k)
-        retrieved_reviews = [self.metadata[i]['text'] for i in I[0]]
+        retrieved_reviews = []
+        for idx in I[0]:
+            retrieved_reviews.append({
+                "text": self.metadata[idx]['text'],
+                "listing_id": self.metadata[idx]['listing_id'],
+                "country": self.metadata[idx]['country'],
+                "city": self.metadata[idx]['city']
+            })
         return retrieved_reviews
 
     def save(self):
