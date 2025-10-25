@@ -41,7 +41,7 @@ def preprocess_and_clean_data():
             fr.comments AS review_text,
             fr.review_lang,
             dl.property_country,
-            dl.city
+            dl.property_city AS city
         FROM
             fact_reviews AS fr
         JOIN
@@ -52,8 +52,10 @@ def preprocess_and_clean_data():
             AND fr.comments NOT LIKE '%unknown%'
             AND dl.property_country IS NOT NULL
             AND LTRIM(RTRIM(dl.property_country)) <> ''
-            AND dl.city IS NOT NULL
-            AND LTRIM(RTRIM(dl.city)) <> ''
+            AND dl.property_country NOT LIKE '%unknown%'
+            AND dl.property_city IS NOT NULL
+            AND LTRIM(RTRIM(dl.property_city)) <> ''
+            AND dl.property_city NOT LIKE '%unknown%'
     """
 
     try:

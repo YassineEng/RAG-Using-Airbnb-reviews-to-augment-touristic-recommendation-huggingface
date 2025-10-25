@@ -26,7 +26,7 @@ def load_reviews_batch(engine, offset):
             review_text,
             review_lang,
             property_country,
-            city
+            property_city
         FROM
             cleaned_reviews_view
         ORDER BY

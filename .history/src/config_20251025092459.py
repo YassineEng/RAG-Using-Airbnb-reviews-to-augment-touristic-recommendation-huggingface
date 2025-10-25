@@ -11,12 +11,9 @@ LLM_MODEL = os.getenv("LLM_MODEL", "qwen/qwen3-next-80b-a3b-thinking")
 SQL_SERVER = os.getenv("SQL_SERVER", r"YASSINE\SQLEXPRESS")
 DATABASE = os.getenv("DATABASE", "AirbnbDataWarehouse")
 
-BATCH_SIZE = int(os.getenv("BATCH_SIZE", 1))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", 1000))
 MAX_WORKERS = int(os.getenv("MAX_WORKERS", 5))
 EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", 300))
-
-SQLITE_PATH = os.getenv("SQLITE_PATH", "airbnb_embeddings.db")
-ID_COLUMN = os.getenv("ID_COLUMN", "listing_id")
 
 FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_airbnb.index")
 META_PATH = os.getenv("META_PATH", "meta_airbnb.pkl")
