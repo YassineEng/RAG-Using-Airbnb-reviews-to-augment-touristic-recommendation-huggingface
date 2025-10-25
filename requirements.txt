@@ -1,9 +1,10 @@
-pandas
-numpy
+langchain
 faiss-cpu
-SQLAlchemy
-openai
-tqdm
 pyodbc
-requests
+sentence-transformers
+transformers
+accelerate
+torch
+tqdm
+numpy
 python-dotenv

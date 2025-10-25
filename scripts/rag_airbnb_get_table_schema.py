@@ -6,10 +6,10 @@ from src.config import SQL_SERVER, DATABASE
 
 def get_table_schema(table_name):
     conn_str = (
-        f"DRIVER={{ODBC Driver 17 for SQL Server}};".replace('{{', '{').replace('}}', '}') + 
-        f"SERVER={SQL_SERVER};".replace('{{', '{').replace('}}', '}') + 
-        f"DATABASE={DATABASE};".replace('{{', '{').replace('}}', '}') + 
-        f"Trusted_Connection=yes;".replace('{{', '{').replace('}}', '}')
+        f"Driver={{ODBC Driver 17 for SQL Server}};"
+        f"Server={SQL_SERVER};"
+        f"Database={DATABASE};"
+        f"Trusted_Connection=yes;"
     )
     try:
         cnxn = pyodbc.connect(conn_str)
