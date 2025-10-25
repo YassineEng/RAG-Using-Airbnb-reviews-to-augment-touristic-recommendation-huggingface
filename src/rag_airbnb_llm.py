@@ -1,5 +1,5 @@
-from langchain_community.llms import HuggingFacePipeline
-from langchain.prompts import PromptTemplate
+from langchain_huggingface import HuggingFacePipeline
+from langchain_core.prompts import PromptTemplate
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from src.rag_airbnb_config import GEN_MODEL
 from src.rag_airbnb_faiss_index import retrieve_from_faiss
@@ -14,6 +14,15 @@ def load_hf_model():
 def answer_query(query, index, reviews, embedder, llm):
     """Retrieves context, formats the prompt, and generates an answer using the LLM."""
     context_docs = retrieve_from_faiss(embedder.encode([query], normalize_embeddings=True), index, reviews, embedder)
+    
+    print("\n--- Retrieved Context (Summary) ---")
+    if context_docs:
+        for i, doc in enumerate(context_docs):
+            print(f"Doc {i+1} (Listing ID: {doc.get('listing_id', 'N/A')}, Review ID: {doc.get('review_id', 'N/A')}): {doc.get('text', '')[:100]}...")
+    else:
+        print("No relevant documents retrieved.")
+    print("-----------------------------------")
+
     context = "\n\n".join([f"[{d['listing_id']}] {d['text']}" for d in context_docs])
     prompt = PromptTemplate.from_template(
         """You are an assistant summarizing Airbnb guest reviews.

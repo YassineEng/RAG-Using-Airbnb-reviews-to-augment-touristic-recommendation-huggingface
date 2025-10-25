@@ -6,7 +6,7 @@ import pyodbc
 # Add project root to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.rag_airbnb_config import SQL_SERVER, DATABASE
+from src.rag_airbnb_config import SQL_SERVER, DATABASE, MDF_FILE_PATH, ODBC_DRIVER
 
 def preprocess_and_clean_data():
     """
@@ -15,10 +15,11 @@ def preprocess_and_clean_data():
     """
     print("Starting data preprocessing and cleaning by creating a SQL view...")
     conn_str = (
-        f"Driver={{ODBC Driver 18 for SQL Server}};"
+        f"Driver={ODBC_DRIVER};"
         f"Server={SQL_SERVER};"
-        f"Database={DATABASE};"
         f"Trusted_Connection=yes;"
+        f"AttachDbFilename={MDF_FILE_PATH};"
+        f"DATABASE={DATABASE};"
     )
     try:
         cnxn = pyodbc.connect(conn_str)

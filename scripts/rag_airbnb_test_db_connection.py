@@ -1,13 +1,20 @@
 import pyodbc
-from src.rag_airbnb_config import SQL_SERVER, DATABASE
+import sys
+import os
+
+# Add project root to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.rag_airbnb_config import SQL_SERVER, DATABASE, MDF_FILE_PATH, ODBC_DRIVER
 
 def test_db_connection():
     """Tests the connection to the SQL Express database using the project's configuration."""
     conn_str = (
-        f"Driver={{ODBC Driver 18 for SQL Server}};"
+        f"Driver={ODBC_DRIVER};"
         f"Server={SQL_SERVER};"
-        f"Database={DATABASE};"
         f"Trusted_Connection=yes;"
+        f"AttachDbFilename={MDF_FILE_PATH};"
+        f"DATABASE={DATABASE};"
     )
     try:
         conn = pyodbc.connect(conn_str)

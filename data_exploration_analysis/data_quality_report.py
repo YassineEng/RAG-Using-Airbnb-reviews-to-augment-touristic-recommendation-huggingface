@@ -6,7 +6,7 @@ import pyodbc
 # Add project root to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.rag_airbnb_config import SQL_SERVER, DATABASE
+from src.rag_airbnb_config import SQL_SERVER, DATABASE, MDF_FILE_PATH, ODBC_DRIVER
 
 def generate_data_quality_report():
     """
@@ -15,10 +15,11 @@ def generate_data_quality_report():
     """
     print("Generating data quality report...")
     conn_str = (
-        f"Driver={{ODBC Driver 18 for SQL Server}};"
+        f"Driver={ODBC_DRIVER};"
         f"Server={SQL_SERVER};"
-        f"Database={DATABASE};"
         f"Trusted_Connection=yes;"
+        f"AttachDbFilename={MDF_FILE_PATH};"
+        f"DATABASE={DATABASE};"
     )
     try:
         cnxn = pyodbc.connect(conn_str)
