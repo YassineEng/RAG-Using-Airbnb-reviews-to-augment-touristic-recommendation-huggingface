@@ -1,13 +1,12 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
 import sys
 import os
+import pyodbc
 
 # Add project root to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.config import SQL_SERVER, DATABASE
-from src.database import get_db_engine
+from src.rag_airbnb_config import SQL_SERVER, DATABASE
 
 def preprocess_and_clean_data():
     """
@@ -15,9 +14,17 @@ def preprocess_and_clean_data():
     This avoids duplicating data and saves storage space.
     """
     print("Starting data preprocessing and cleaning by creating a SQL view...")
-    engine = get_db_engine()
-    if not engine:
-        print("❌ Failed to get database engine. Exiting.")
+    conn_str = (
+        f"Driver={{ODBC Driver 18 for SQL Server}};"
+        f"Server={SQL_SERVER};"
+        f"Database={DATABASE};"
+        f"Trusted_Connection=yes;"
+    )
+    try:
+        cnxn = pyodbc.connect(conn_str)
+        cursor = cnxn.cursor()
+    except Exception as e:
+        print(f"❌ Error connecting to the database: {e}")
         return
 
     view_name = "cleaned_reviews_view"
@@ -25,9 +32,8 @@ def preprocess_and_clean_data():
     # Drop the view if it already exists to ensure a fresh creation
     drop_view_sql = f"IF OBJECT_ID('{view_name}', 'V') IS NOT NULL DROP VIEW {view_name};"
     try:
-        with engine.connect() as connection:
-            connection.execute(text(drop_view_sql))
-            connection.commit()
+        cursor.execute(drop_view_sql)
+        cnxn.commit()
         print(f"Dropped existing view '{view_name}' (if it existed).")
     except Exception as e:
         print(f"❌ Error dropping existing view {view_name}: {e}")
@@ -59,14 +65,15 @@ def preprocess_and_clean_data():
     """
 
     try:
-        with engine.connect() as connection:
-            connection.execute(text(create_view_sql))
-            connection.commit()
+        cursor.execute(create_view_sql)
+        cnxn.commit()
         print(f"✅ Successfully created view '{view_name}'.")
         print("This view dynamically provides cleaned data without duplicating storage.")
     except Exception as e:
         print(f"❌ Error creating view {view_name}: {e}")
         return
+    finally:
+        cnxn.close()
 
 if __name__ == "__main__":
     preprocess_and_clean_data()

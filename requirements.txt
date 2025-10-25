@@ -8,3 +8,4 @@ torch
 tqdm
 numpy
 python-dotenv
+langchain-community
