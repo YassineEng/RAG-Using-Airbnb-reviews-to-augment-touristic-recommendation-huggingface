@@ -49,7 +49,7 @@ def retrieve_from_faiss(query_vector, index, reviews_for_faiss, embedder, top_k=
         print("⚠️ FAISS index or review metadata not available for retrieval.")
         return []
 
-    D, I = index.search(np.array([query_vector], dtype=np.float32), top_k)
+    D, I = index.search(np.array(query_vector, dtype=np.float32), top_k)
     
     retrieved_docs = []
     for idx in I[0]:
