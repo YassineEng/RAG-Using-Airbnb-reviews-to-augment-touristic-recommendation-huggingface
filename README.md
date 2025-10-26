@@ -1,8 +1,28 @@
-# RAG-Augmented Touristic Recommendations from Airbnb Reviews
+# RAG-Augmented Touristic Recommendations from Airbnb Reviews [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-green.svg)](https://github.com/YassineEng/RAG-Using-Airbnb-reviews-to-augment-touristic-recommendation-huggingface)
+
+![Project Demo](https://placehold.co/600x400/000000/FFFFFF/gif?text=Project+Demo)
+
 
 This project leverages a Retrieval-Augmented Generation (RAG) model to provide touristic recommendations based on a large dataset of Airbnb reviews. By analyzing real guest experiences, the system can answer user queries about cities, neighborhoods, and specific listings, offering nuanced insights that go beyond simple ratings.
 
-## 🌟 Features
+## Table of Contents
+
+- [Features](#features)
+- [Key Technologies](#key-technologies)
+- [Models](#models)
+- [Data](#data)
+- [Data Acquisition](#data-acquisition)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Ethical Considerations](#ethical-considerations)
+- [Disclaimer](#disclaimer)
+- [Acknowledgments](#acknowledgments)
+- [Future Work](#future-work)
+
+## Features
 
 - **RAG-based QA:** Utilizes a RAG pipeline to retrieve relevant Airbnb reviews and generate human-like answers to user questions.
 - **FAISS Indexing:** Employs FAISS for efficient similarity search over a large number of review embeddings.
@@ -10,7 +30,39 @@ This project leverages a Retrieval-Augmented Generation (RAG) model to provide t
 - **Interactive CLI:** Provides a simple command-line interface to interact with the RAG model.
 - **SQLite Caching:** Caches review embeddings in an SQLite database to speed up subsequent runs.
 
-## 🚀 Getting Started
+## Key Technologies
+
+- **Python:** The core programming language for the project.
+- **Hugging Face Transformers:** For state-of-the-art NLP models.
+- **FAISS:** For efficient similarity search.
+- **SQLite:** For caching embeddings.
+- **Pandas:** For data manipulation.
+- **NumPy:** For numerical operations.
+
+## Models
+
+This project uses the following models from Hugging Face:
+
+- **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2`
+- **Language Model:** `HuggingFaceH4/zephyr-7b-beta`
+
+## Data
+
+The project uses a dataset of Airbnb reviews. The data is preprocessed and cleaned to ensure quality. The embeddings are generated from the reviews and stored in a FAISS index.
+
+## Data Acquisition
+
+The dataset is not included in this repository. You will need to provide your own `reviews.csv` file.
+
+The data processing and ETL steps are handled in this repository:
+
+[**SQL-ETL-data-warehouse-Inside-Airbnb**](https://github.com/YassineEng/SQL-ETL-data-warehouse-Inside-Airbnb)
+
+1. Follow the instructions in the repository above to process the data and generate the `reviews.csv` file.
+2. Create a `data` folder in the root of this project.
+3. Place the `reviews.csv` file in the `data` folder.
+
+## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -38,7 +90,26 @@ These instructions will get you a copy of the project up and running on your loc
    pip install -r requirements.txt
    ```
 
-## 🎈 Usage
+### Setup
+
+To use the models from the Hugging Face Hub, you need to set up an environment variable with your access token.
+
+1. **Get your Hugging Face Hub access token:**
+   - If you don't have one, create an account on [Hugging Face](https://huggingface.co/) and go to your [settings](https://huggingface.co/settings/tokens) to create a new access token.
+
+2. **Set the environment variable:**
+   - **Windows:**
+     ```bash
+     set HUGGING_FACE_HUB_TOKEN=your_token_here
+     ```
+   - **Linux/macOS:**
+     ```bash
+     export HUGGING_FACE_HUB_TOKEN=your_token_here
+     ```
+
+   Replace `your_token_here` with your actual Hugging Face Hub access token.
+
+## Usage
 
 To start the application, run the `rag_airbnb_main.py` script:
 
@@ -53,20 +124,27 @@ Once the model is loaded, you can ask questions like:
 - "What are the pros and cons of staying in the Montmartre district of Paris?"
 - "Are there any reviews that mention a good view of the Eiffel Tower?"
 - "is paris a good city to visit"
+- "What are the best restaurants near the Louvre?"
+- "What are the best places to visit in New York?"
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 RAG-Using-Airbnb-reviews-to-augment-touristic-recommendation-huggingface/
 ├── .gitignore
-├── hugging_airbnb_embeddings.db  # SQLite database for caching embeddings
 ├── LICENSE
 ├── pyproject.toml
 ├── rag_airbnb_main.py            # Main script to run the application
 ├── README.md
 ├── requirements.txt
-├── reviews_hf.index              # FAISS index for fast review retrieval
-├── reviews_hf.pkl                # Metadata for the FAISS index
+├── data/                           # Not included in the repository
+│   └── reviews.csv
+├── data_exploration_analysis/
+│   ├── data_quality_report.py
+│   └── preprocess_and_clean_data.py
+├── scripts/
+│   ├── rag_airbnb_get_table_schema.py
+│   └── rag_airbnb_test_db_connection.py
 ├── src/
 │   ├── __init__.py
 │   ├── rag_airbnb_config.py      # Configuration file for models and paths
@@ -74,13 +152,34 @@ RAG-Using-Airbnb-reviews-to-augment-touristic-recommendation-huggingface/
 │   ├── rag_airbnb_embedding.py   # Functions for creating review embeddings
 │   ├── rag_airbnb_faiss_index.py # Functions for building and querying the FAISS index
 │   └── rag_airbnb_llm.py         # Functions for interacting with the LLM
-└── ...
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue if you have any suggestions or find any bugs.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Ethical Considerations
+
+- **Bias:** The model's recommendations are based on the data it was trained on. This data may contain biases, which could be reflected in the model's recommendations.
+- **Privacy:** The data used in this project is publicly available. However, it is important to be mindful of privacy concerns when working with user-generated data.
+- **Transparency:** The project is open-source, and the code is available for anyone to inspect.
+
+## Disclaimer
+
+This project is for educational purposes only. The recommendations provided by the model are not guaranteed to be accurate and should not be used for making financial or travel decisions. The author is not responsible for any damages resulting from the use of this project, or for any misuse of the information provided by the model.
+
+## Acknowledgments
+
+- The data used in this project was scraped from the [**Inside Airbnb**](http://insideairbnb.com/) website.
+- The pre-trained language models are provided by [**Hugging Face**](https://huggingface.co/).
+
+## Future Work
+
+- **Web interface:** Create a web interface for the application.
+- **More data:** Add more data to the model to improve its recommendations.
+- **More models:** Experiment with different models to improve the model's performance.
+- **Deployment:** Deploy the model to a cloud platform.
