@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pyodbc
-from src.config import SQL_SERVER, DATABASE
+from src.rag_airbnb_config import SQL_SERVER, DATABASE
 
 def get_table_schema(table_name):
     conn_str = (
@@ -34,7 +34,7 @@ def get_table_schema(table_name):
         cnxn.close()
     except pyodbc.Error as e:
         print(f"❌ Error connecting to or querying the database: {e}")
-        print("Please ensure SQL Server is running and connection details in src/config.py are correct.")
+        print("Please ensure SQL Server is running and connection details in src/rag_airbnb_config.py are correct.")
 
 import sys
 
